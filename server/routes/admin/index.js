@@ -62,4 +62,16 @@ module.exports = (app) => {
     },
     router
   );
+
+  const multer = require("multer");
+
+  const upload = multer({ dest: __dirname + "/../../uploads" });
+  // 中间件upload 允许接受字段名file得单个文件
+
+  app.post("/admin/api/upload", upload.single("file"), async (req, res) => {
+    // 借助multer req才有file，
+    const file = req.file;
+    file.url = `http://localhost:3000/uploads/${file.filename}`;
+    res.send(file);
+  });
 };

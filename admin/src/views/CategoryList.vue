@@ -36,7 +36,7 @@ export default {
 
   methods: {
     async init() {
-      const res = await this.$http.get("/categories");
+      const res = await this.$http.get("/rest/categories");
 
       this.items = res.data;
     },
@@ -49,7 +49,7 @@ export default {
         type: "warning",
       })
         .then(async () => {
-          await this.$http.delete(`/categories/${item._id}`);
+          await this.$http.delete(`/rest/categories/${item._id}`);
           this.$message({
             type: "success",
             message: "删除成功!",

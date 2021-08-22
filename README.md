@@ -257,3 +257,89 @@ router.get("/", async (req, res) => {
   res.send(items);
 });
 ````
+
+## 装备管理
+
+在通用 CRUD 写好后就很容易了
+
+1. 赋值 categoryitem categorylist 修改，前端修改路由
+2. 后端接口处没有 Item 模型，加模型 Item.js -》（name + icon）
+   icon :不直接把图片上传，而是把图片上传到平台，保存提供的是图片地址路径(html)
+
+## 图片上传
+
+1. 上传-》 后台-》保存 -》返回给前端-》html 里显示
+   即： onsuccess -》赋值给 model.icon
+   【必须给==完整地址==，icon 上传用的是自带的 axios，不是我们的$http】-> 动态绑定:action="$http.defaults.baseURL + '/upload'"
+   ```
+      <el-upload
+          class="avatar-uploader"
+          :action="$http.defaults.baseURL + '/upload'"
+          :show-file-list="false"
+          :on-success="afterUpload"
+        >
+          <img v-if="model.icon" :src="model.icon" class="avatar" />
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+   ```
+2. 后端 ： 传来的字段名是 file
+   1. 新建 app.use 路径
+   2. 安装 multer 中间件 ，允许接口处理上传文件，处理图片。
+      一定要加 multer 才会有 req.file
+      server ->> index.js
+
+```
+  const multer = require("multer");
+
+  const upload = multer({ dest: __dirname + "/../../uploads" });
+  // 中间件upload 允许接受字段名file得单个文件
+
+  app.post("/admin/api/upload", upload.single("file"), async (req, res) => {
+    // 借助multer req才有file，
+    const file = req.file;
+    res.send(file);
+  });
+
+
+```
+
+3. ==【！！】托管静态文件==
+   server/indexjs 里：
+
+```
+
+// uploads下静态文件托管 ，通过/uploads可以访问
+app.use("uploads", express.static(__dirname + "/uploads"));
+```
+
+4. 返回文件路径
+
+admin/indexjs 里：
+
+```
+app.post("/admin/api/upload", upload.single("file"), async (req, res) => {
+    // 借助multer req才有file，
+    const file = req.file;
+    file.url = `http://localhost:3000/uploads/${file.filename}`;
+    res.send(file);
+  });
+```
+
+5.  【！！】前端接受 url ，显示图片
+    ==数据响应式==
+    this.$set 显式赋值 数据响应
+    ```
+        afterUpload(res) {
+       // console.log(res);
+       this.$set(this.model, "icon", res.url);
+     },
+    ```
+    ==src 动态绑定千万别忘了冒号==
+    ````
+    <el-table-column prop="icon" label="物品图片">
+    <template slot-scope="scope"
+              ><img :src="scope.row.icon" alt="" style="height: 3 rem"
+            /></template>
+    </el-table-column>
+          ```
+    ````

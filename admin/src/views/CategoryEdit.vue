@@ -44,10 +44,10 @@ export default {
       if (this.id) {
         // 修改item,携带id
         console.log(this.model);
-        res = await this.$http.put(`/categories/${this.id}`, this.model);
+        res = await this.$http.put(`/rest/categories/${this.id}`, this.model);
       } else {
         // 新增item
-        res = await this.$http.post("/categories", this.model);
+        res = await this.$http.post("/rest/categories", this.model);
       }
       console.log(res);
       this.$router.push("/categories/list");
@@ -57,11 +57,11 @@ export default {
       });
     },
     async init() {
-      const res = await this.$http.get(`/categories/${this.id}`);
+      const res = await this.$http.get(`/rest/categories/${this.id}`);
       this.model = res.data;
     },
     async initParents() {
-      const res = await this.$http.get(`/categories`);
+      const res = await this.$http.get(`/rest/categories`);
       this.parents = res.data;
     },
   },
