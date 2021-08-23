@@ -266,7 +266,7 @@ router.get("/", async (req, res) => {
 2. 后端接口处没有 Item 模型，加模型 Item.js -》（name + icon）
    icon :不直接把图片上传，而是把图片上传到平台，保存提供的是图片地址路径(html)
 
-## 图片上传
+## 图片上传(利用 multer)
 
 1. 上传-》 后台-》保存 -》返回给前端-》html 里显示
    即： onsuccess -》赋值给 model.icon
@@ -343,3 +343,450 @@ app.post("/admin/api/upload", upload.single("file"), async (req, res) => {
     </el-table-column>
           ```
     ````
+
+## 英雄管理
+
+赋值 itemlist itemedit
+为 herolist heroedit
+添加前端路由，后端模型，修改 data 即可
+
+## 编辑英雄 【设计数据结构，关注命名规范】【数据库的关联,多选,el-select, multiple】
+
+1. 数据类型 Hero 的定义
+
+   1. category 表关联 一个英雄关联多个分类
+
+   ```
+     categories: [{ type: mongoose.SchemaTypes.ObjectId, ref: 'Category' }],
+   ```
+
+   2. Object scores -》 4 个 key-value
+
+   ```
+     scores: {
+    difficult: { type: Number },
+    skills: { type: Number },
+    attack: { type: Number },
+    survive: { type: Number },
+   },
+   ```
+
+   3. partners ： 关联 hero 再加一个 key:description， 多了一个字段
+
+   ```
+       partners: [
+   {
+   hero: { type: mongoose.SchemaTypes.ObjectId, ref: "Hero" },
+   description: { type: String },
+   },
+   ],
+
+   ```
+
+2. 编辑 admin 页面
+
+   1. '类型' 是 v-for 循环出来的下拉多选菜单
+      created 时先从后端获得所有的 categories（可修改）
+      由于 hero 的模型保存的时 categories 的 id，并且和 categories 关联，可以直接取出 id 对应的 name
+
+   ```
+       <el-form-item label="类型"
+       ><el-select v-model="model.categories" multiple>
+         <el-option
+           v-for="item of categories"
+           :key="item._id"
+           :label="item.name"
+           :value="item._id"
+         >
+         </el-option></el-select
+     ></el-form-item>
+   ```
+
+   2. 难度的绑定
+      model 里的 score 可能为空，取不到 model.score.difficult
+      ==【！！】==如果直接给 data 添加一个 scores 空对象，会被 init()覆盖
+      那么用：==assign==
+
+   ```
+   async init() {
+      const res = await this.$http.get(`/rest/heros/${this.id}`);
+      // this.model = res.data;
+        // 注意升级
+      this.model = Object.assign({}, this.model, res.data);
+    },
+    async initCategories() {
+      const res = await this.$http.get(`/rest/categories`);
+
+      this.categories = res.data;
+      // this.model = Object.assign({}, this.model, res.data);
+    },
+   ```
+
+     <!-- rate组件要求difficult默认是空字符串 -->
+
+```
+data() {
+    return {
+      categories: [],
+      model: {
+        name: "",
+        avatar: "",
+        scores: {
+          difficult: "",
+        },
+      },
+    };
+  },
+```
+
+3. 技能，攻击，生存：同上
+4. 顺风出装： 同 categories， 先 data 里定个 items， 再 created()时候到后端获取 items ，下拉多选
+
+## 技能编辑
+
+1. el-tabs 组合整理界面
+2. el-colm 循环的 model.skills 数组 , 数组里的 obj 是技能详情
+   ` <el-col :md="12" v-for="(item, i) in model.skills" :key="i">`
+
+   1. 数据结构如下：
+
+      ```
+      skills: [
+      {
+      icon: { type: String },
+      name: { type: String },
+      delay: { type: String },
+      cost: { type: String },
+      description: { type: String },
+      tips: { type: String },
+      },
+      ],
+      ```
+
+      点击按钮新添加技能 obj{}
+
+      ```
+       <el-button size="small" @click="model.skills.push({})">
+            <i class="el-icon-plus"></i> 添加技能
+          </el-button>
+
+      ```
+
+   2. 给 form-item 绑定到对应的数据上 比如 icon name etc...
+   3. 显式赋值 $set
+
+   4. 删除 -》 就是删除 skills 数组里的 object 元素 SPLICE 方法
+
+   ```
+       <el-form-item>
+     <el-button
+       size="small"
+       type="danger"
+       @click="model.skills.splice(i, 1)"
+       >删除</el-button
+     >
+   </el-form-item>
+   ```
+
+## 文章管理，富文本编辑器
+
+1. 组件：articleedit articlelist 数据模型
+2. 文章分类是数组[]
+3. ==【！！】==文章详情：富文本编辑器(后台可视化编辑) quil -》vue2editor
+4. import {~~} from ~~~ 解构写法
+   原理：html 标签形成 加一些样式
+5. 上传图片：二进制数据 -》》img url
+6. ==【！】==原始是转换成了二进制文件-》庞大
+7. 组件修改：方法 handleimageadded
+   ```
+   <vue-editor
+   v-model="model.body"
+   useCustomImageHandler
+   @image-added="handleImageAdded" ></vue-editor>
+   ```
+8. 修改上传的字段名 -》》 file(binary)
+9. 调用 this.$http.upload 自己定义的 axios 方法(await 替代 promisethen，很简洁)
+   ```
+   async handleImageAdded(file, Editor, cursorLocation, resetUploader) {
+     const formData = new FormData();
+     <!-- 字段名file -->
+     formData.append("file", file);
+     // 调用自己的axios接口
+     const res = await this.$http.post("upload", formData);
+     // 模仿原来他的代码
+     Editor.insertEmbed(cursorLocation, "image", res.data.url);
+     resetUploader();
+   },
+   ```
+
+## 首页广告管理
+
+1. 广告的数据模型：数组存储【对象】：
+   跳转链接 url，
+   图片 img
+
+```
+const schema = new mongoose.Schema({
+name: { type: String },
+items: [
+  {
+    image: { type: String },
+    url: { type: String },
+  },
+],
+});
+```
+
+2. 广告元素 items: 模仿'英雄技能界面'
+3. 注意 data 里初始化空元素防止找不到、 注意不能直接幅值(会覆盖)，用合并
+4. 修改全局 css : 上传图片的样式全局通用，限高
+
+## ==【权限】==管理员账号管理【bcryptjs】
+
+先建模型再写页面
+
+1. 新增一个模型
+   ==【！！】==密码不能用明文存储 -> 散列保存
+   在 server【服务器】 安装 bcryptjs 包
+   不是 admin
+   1. set 方法 接受一个值 return 一个值，这里做散列
+      用到【模块 bcrypt】做散列，hashSync 同步方法
+   2. select false ： 不能被查出来的 keyvalue
+
+```
+
+const mongoose = require('mongoose')
+
+const schema = new mongoose.Schema({
+  username: { type: String },
+  password: {
+    type: String,
+    select: false,
+    set(val) {
+      return require('管理员账号管理【bcryptjs】').hashSync(val, 10)
+    }
+  },
+})
+
+module.exports = mongoose.model('AdminUser', schema)
+```
+
+## 登陆页面
+
+1. router 添加登录页（单独的平级页面）
+2. login.vue
+3. data: model 绑定 -》 model.username model.password
+4. server/index 写接口
+   收数据校验返回 token，实现鉴权
+   ==解构赋值==req.body 里的 name 和 pswd 数据库查询
+   【是根据 usname 去找，因为密码被散列了】
+
+   1. 引用 user 模型
+      findone 找一条
+      assert 返回错误的 code 和 message ，它们在前端捕获显示【坑：必须 express5】
+      http-assert 包 抛出信息
+
+   ```
+   app.post('/admin/api/login', async (req, res) => {
+   const { username, password } = req.body
+   // 1.根据用户名找用户
+   const user = await AdminUser.findOne({ username }).select('+password')
+   <!-- 直接抛出错误，最后中间件处理【错误处理】 -->
+   assert(user, 422, '用户不存在')
+   // 2.校验密码
+   const isValid = require('bcrypt').compareSync(password, user.password)
+   assert(isValid, 422, '密码错误')
+   // 3.返回token
+   const token = jwt.sign({ id: user._id }, app.get('secret'))
+   res.send({ token })
+   })
+   ```
+
+   2. ==【！！】==http 里全局捕获 err
+
+   ```
+   // 拦截器-》》响应拦截
+   http.interceptors.response(
+   (res) => {
+    return res;
+   },
+   (err) => {
+    // 保险：有才执行
+    if (err.response.data.message) {
+      // 状态码》400 进入err
+      // promise.reject 抛回err
+      // vue -》element ui 的style
+      Vue.prototype.message({
+        type: "error",
+        message: err.response.data.message,
+      });
+      return Promise.reject(err);
+    }
+   }
+   );
+   ```
+
+   根据 err 让客户端显示不同文字
+   并且不需要让每个页面都监听 err，
+
+   3. ==【！！】==token
+      利用 jsonwebtoken 模块（server 安装）做 webtoken 验证，生成 token 返回
+   1. 【在全局设置一个 secret 用作密钥】
+   1. 路由里用 app.get('secret')可以获得
+   1. 前端保存 token -》 localstorage 保存
+
+   ```
+    async login() {
+   const res = await this.$http.post("login", this.model);
+   //   得到返回的token，存到loalstorage里
+   // sessionStorage.token = res.data.token
+   localStorage.token = res.data.token;
+   this.$router.push("/");
+   this.$message({
+     type: "success",
+     message: "登录成功",
+   });
+   },
+   ```
+
+5. ==【！！】【中间件封装】==页面校验(后端接口权限) token -》有 token 才能进入
+   1. 在请求头 request headers 里添加用户信息【'bearer ' + token】
+      httpjs 里：
+
+```
+http.interceptors.request.use(function (config) {
+  // Do something before request is sent
+  if (localStorage.token) {
+    <!-- bearer行业规范 -->
+    config.headers.Authorization = 'Bearer ' + localStorage.token
+  }
+  return config;
+}, function (error) {
+  // Do something with request error
+  return Promise.reject(error);
+});
+```
+
+2. 登录校验中间件==封装==【考虑中间件的扩展，写一个函数返回函数，调用函数使用中间件】
+   indexjs 里
+
+```
+ // 登录校验中间件
+const authMiddleware = require('../../middleware/auth')
+const resourceMiddleware = require('../../middleware/resource')
+<!-- 小括号执行函数 -->
+app.use('/admin/api/rest/:resource', authMiddleware(), resourceMiddleware(), router)
+
+const multer = require('multer')
+const MAO = require('multer-aliyun-oss');
+const upload = multer({
+  // dest: __dirname + '/../../uploads',
+  storage: MAO({
+    config: {
+      region: 'oss-cn-zhangjiakou',
+      accessKeyId: '替换为你的真实id',
+      accessKeySecret: '替换为你的真实secret',
+      bucket: 'node-vue-moba'
+    }
+  })
+})
+```
+
+auth 里 : 函数接收参数， return 一个函数 注意 require ，路径
+req.app 得到 app
+
+```
+module.exports = (options) => {
+  <!-- 注意路径 -->
+  const assert = require("http-assert");
+  const jwt = require("jsonwebtoken");
+  const AdminUser = require("../models/AdminUser");
+
+  return async (req, res, next) => {
+    const token = String(req.headers.authorization || "")
+      .split(" ")
+      .pop();
+    assert(token, 401, "请先登录");
+    const { id } = jwt.verify(token, req.app.get("secret"));
+    assert(id, 401, "请先登录");
+    req.user = await AdminUser.findById(id);
+    assert(req.user, 401, "请先登录");
+    await next();
+  };
+};
+
+```
+
+resource.js 里
+
+```
+module.exports = (options) => {
+  return async (req, res, next) => {
+    const modelName = require("inflection").classify(req.params.resource);
+    req.Model = require(`../models/${modelName}`);
+    next();
+  };
+};
+```
+
+6. ==【！！】==错误处理中间件:index 里面直接抛出异常，最后中间件捕获异常，自己选择处理方法：err.statuscode
+
+```
+  // 错误处理函数
+  app.use(async (err, req, res, next) => {
+    // console.log(err)
+    res.status(err.statusCode || 500).send({
+      message: err.message
+    })
+  })
+```
+
+7. 前端根据错误信息跳出提示信息
+8. ==【！！】==路由元信息 和 导航守卫
+   1. meta 路由元信息
+      router->index.js 里 ==【meta】==
+
+```
+ {
+    path: "/login",
+    name: "login",
+    component: Login,
+    meta: { isPublic: true },
+  },
+```
+
+2. beforeeach 导航首位 ，注意判断条件
+
+```
+router.beforeEach((to, from ,next) => {
+if (!to.meta.isPublic && !localStorage.token) {
+  return next('/login')
+}
+next()
+})
+```
+
+9. mixin 混入 让每个 vue 实例都有
+   1. UPLOAD 组件提交用的是 ajax 底层库，不能用 axios 了
+      用全局 mixin 使每个组件获得 authorization(method)
+      再在每个 vue 组件 upload 里绑定 uploadurl 和 getauthheaders，
+      上传图片时，获得 authorization，通过 authMiddleware()
+   2. 计算属性节省代码 ：this.$http.defaults.baseURL + "/upload"
+      不用每次都写
+
+```
+Vue.mixin({
+  computed: {
+    uploadUrl() {
+      return this.$http.defaults.baseURL + "/upload";
+    },
+  },
+  methods: {
+    getAuthHeaders() {
+      return {
+        Authorization: `Bearer ${localStorage.token || ""}`,
+      };
+    },
+  },
+});
+```

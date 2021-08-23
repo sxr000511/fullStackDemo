@@ -5,6 +5,8 @@ const app = express();
 app.use(express.json());
 
 app.use(require("cors")());
+// token密钥
+app.set("secret", "12345667");
 
 // uploads下静态文件托管 ，通过/uploads可以访问
 app.use("/uploads", express.static(__dirname + "/uploads"));
