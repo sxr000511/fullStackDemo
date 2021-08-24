@@ -790,3 +790,655 @@ Vue.mixin({
   },
 });
 ```
+
+# web 移动端网站
+
+## SASS (SCSS)
+
+## 第一步：重置样式 box
+
+1. 必加： box-sizing ：border-box -》》以 border 为准，不撑大盒子，而是挤压内容
+2. html 根元素
+3. rem 以 html 根元素为准 -》13px
+
+4. body 充值 ：
+5. 无 margin，
+6. 字体 font-family
+7. 行高 1.2 em 当前字体 1.2 倍
+8. 灰色背景
+
+```
+// reset
+* {
+  box-sizing: border-box;
+  outline: none;
+}
+html {
+  font-size: 13px;
+}
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.2em;
+  background: #f1f1f1;
+  -webkit-font-smoothing: antialiased;
+}
+a {
+  color: #999;
+}
+p {
+  line-height: 1.5em;
+}
+```
+
+## 第二步：网站色彩整体 color text【助手工具类】
+
+1. 网站主要颜色：变量定义
+2. ==【工具类】== @each 循环生成工具类 -》color text
+   ,$变量,
+   注意是否加#
+
+```
+@each $colorKey, $color in $colors {
+  .text-#{$colorKey} {
+    color: $color;
+  }
+  .bg-#{$colorKey} {
+    background-color: $color;
+  }
+}
+// text align
+@each $var in (left, center, right) {
+  .text-#{$var} {
+    text-align: $var !important;
+  }
+}
+
+```
+
+3. ==【工具类】== @each 循环生成工具类 -》font-size
+   相对于 rem 的大小，两个变量，乘积控制
+   ->>>>xxs，xs，~~~，xl，etc
+
+   ```
+   $base-font-size: 1rem;
+   $font-sizes: (
+   xxs: 0.6154,
+   xs: 0.7692,
+   //10px
+    sm: 0.9231,
+   //12px
+    md: 1,
+   //13px
+    lg: 1.0769,
+   //14px
+    xl: 1.2308,
+   //16px,,,,
+   );
+   ```
+
+   ```
+   // 乘积比例
+   @each $sizeKey, $size in $font-sizes {
+    .fs-#{$sizeKey} {
+      font-size: $size * $base-font-size;
+    }
+   }
+   ```
+
+## 第三步：网站 flex 布局整体【助手工具类】
+
+使用广泛，基本全兼容
+需要用 flex 的时候就可以调用 d-flex
+
+```
+// flex
+.d-flex {
+  display: flex;
+}
+
+```
+
+<!-- 循环生成代码 -->
+
+```
+$flex-jc: (
+  start: flex-start,
+  end: flex-end,
+  center: center,
+  between: space-between,
+  around: space-around,
+);
+
+```
+
+```
+@each $key, $value in $flex-jc {
+  .jc-#{$key} {
+    justify-content: $value;
+  }
+}
+
+```
+
+## 第四步：常用边距整体定义 (margin, padding)
+
+spacing，定义几种标准边距，上右下左
+.MT -1 含义是=》margin top 一级
+两层循环
+
+```
+  @each $directionKey, $direction in $spacing-directions {
+    @each $sizeKey, $size in $spacing-sizes {
+      <!-- .mt-1 -->
+      <!-- margin-top:~~~ -->
+      .#{$typeKey}#{$directionKey}-#{$sizeKey} {
+        #{$type}-#{$direction}: $size * $spacing-base-size;
+      }
+    }
+  }
+```
+
+## 页面设计：主页框架和顶部菜单
+
+顶部不是每个页面都有，不能写在 appvue 入口页面
+
+1. 新建 mainvue 做入口框架【bar + nav +routerview】，home 是真正的主页
+   路由如下
+
+```
+const routes = [
+  {
+    path: "/",
+    name: "main",
+    component: Main,
+    children: [
+      {
+        path: "/",
+        name: "home",
+        component: Home,
+      },
+    ],
+  },
+  {
+    ~~~~
+  },
+];
+```
+
+2. topbar 里 中间的 div 在 flex 里占的大，把两边撑开 -》》加个 class flex-1
+3. nav 里
+
+```
+    <!-- nav模块 -->
+    <div class="nav bg-primary py-2">
+      <div class="nav">
+        <div class="nav-item"><router-link></router-link></div>
+      </div>
+    </div>
+```
+
+router-link 默认生成 a 标签 -> tag:div
+
+1. 设计 bottom line : 普通底部透明【为了保证对其】，active 底部白色 ，& 表示上一层的本身
+
+```
+// nav
+.nav {
+display: flex;
+.nav-item {
+  border-bottom: 3px solid transparent;
+  padding-bottom: 0.2rem;
+  &.active {
+    color: map-get($colors, 'primary');
+    border-bottom-color: map-get($colors, 'primary');
+  }
+}
+&.nav-inverse {
+  .nav-item {
+    color: map-get($colors, 'white');
+    &.active {
+      border-bottom-color: map-get($colors, 'white');
+    }
+  }
+}
+
+}
+```
+
+## 幻灯片 swiper 组件 vueawesomeswiper
+
+1. vue-awesome-swiper + swiper 组件,全局引用
+2. 加右下角的点：swiperoption + pagenation 1. style 里变量引用分离 2. 配置有坑
+   ```
+   import Swiper2, { Navigation, Pagination } from "swiper";
+   Swiper2.use([Navigation, Pagination]);
+   ```
+3. sass: 被包含的文件下划线\_开头，引用他的时候不用加下划线
+
+## 中间部分： 精灵图(spritecow)
+
+1. v-for 循环生成
+2. .nav-icons ->> .nav-item 样式
+3. style.css -> sprite 1. ==【！！】==注意二倍像素 ：bgrd-size ：375 虽然图片 750 2. i 标签 -》》inline-block 3. ==【！！】==sprite 定位 -》sprite-cow http://www.spritecow.com/
+
+   ```
+   // sprite
+   .sprite {
+   background: url(../images/index.png) no-repeat 0 0;
+   background-size: 28.8462rem;
+   display: inline-block;
+   &.sprite-news {
+   width: 1.7692rem;
+   height: 1.5385rem;
+   background-position: 63.546% 15.517%;
+   }
+   &.sprite-arrow{
+   width: 0.7692rem;
+   height: 0.7692rem;
+   background-position: 38.577% 52.076%;
+   }
+   }
+
+   ```
+
+4. border style
+   4n ： 没有右边框 -》选择器
+
+```
+.nav-icons {
+  border-top: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  .nav-item {
+    width: 25%;
+    border-right: 1px solid $border-color;
+    &:nth-child(4n) {
+      border-right: none;
+    }
+  }
+}
+```
+
+5. 边框
+
+## 使用【字体图标】 (iconfont)
+
+https://www.iconfont.cn/
+
+1. 下载代码
+2. mainjs 里引用
+3. 使用见文件夹里的 html
+
+## ==【常用】==卡片组件(card)
+
+图标 + 名称 -》》+》》链接
+==【封装 nav + swiper(文章)】==
+头部可以封装，内容不行
+
+1. components -> listcard + card
+
+   1. card : tittle + icon 来自传参
+      【card 构成了卡片布局最上面的 header】
+      【主体是一个 slot，会放入 listcard】
+
+2. mainjs 里全局引用
+
+```
+import Card from './components/Card.vue'
+Vue.component('m-card', Card)
+
+```
+
+## ==【常用】==卡片组件(Listcard)
+
+1. listcard 由 card 而来，是 card 的 slot
+2. listcard 主要构成了卡片布局里的 tab 和下面的 swiper 组件
+3. listcard swiper 里面的单条 category 由==作用于插槽==传回给 homevue【子传父】
+4. 父组件 home.vue 里：==【父组件可以决定子组件每一个循环体的 style】==
+   1. listcard-》card 组件调用形成 head，自己形成 tab 和 slide
+   2. 【外部获得每个 category 循环 v-for 显示，一行一行的文字】
+   ```
+      <m-list-card icon="category" title="新闻资讯" :categories="newsCats">
+     <!-- 作用域插槽 -->
+     <!-- 通过#获得子组件slot绑定的category -->
+     <template #items="{category}">
+       <router-link
+       tag="div"
+       :to="`/articles/${news._id}`"
+       class="py-2 fs-lg d-flex"
+       v-for="(news, i) in category.newsList" :key="i">
+         <span class="text-info">[{{news.categoryName}}]</span>
+         <span class="px-2">|</span>
+         <span class="flex-1 text-dark-1 text-ellipsis pr-2">{{news.title}}</span>
+         <span class="text-grey-1 fs-sm">{{news.createdAt | date}}</span>
+       </router-link>
+     </template>
+   </m-list-card>
+   ```
+
+## 首页新闻资讯-数据录入(+后台 bug 修复)
+
+1. 修改后台 bug：后台 admin
+   让 routerview 以 route 做区分，' <router-view :key="$route.path"></router-view>'
+2. 完善前端 web 页面：吸顶
+
+   ```
+   <style lang="scss">
+   .topbar {
+   position: sticky;
+   top: 0;
+   <!-- 层级变高 -->
+   z-index: 999;
+   }
+   </style>
+   ```
+
+   3.== 【！！】==从后台录入信息： 分类 和 新闻
+
+   1. 热门不算新闻分类的子分类
+   2. ==录入信息的神操作== -》》 mongodb 教程
+      由此每次访问 web/api/news/init 接口都会清空 article 表然后放入新随机的 article
+
+   ```
+       // 导入新闻数据
+   router.get('/news/init', async (req, res) => {
+     // 每次调用init接口都会清空article 插入随机的数据
+   const parent = await Category.findOne({
+     name: '新闻分类'
+   })
+   //   获得新闻分类下的所有子分类
+   const cats = await Category.find().where({
+     parent: parent
+   }).lean()
+   //   数据
+   const newsTitles = ["夏日新版本“稷下星之队”即将6月上线",..."]
+   //  map方法处理数组news，给他们随机的两个分类
+   const newsList = newsTitles.map(title => {
+     //   sort 随机分类
+     const randomCats = cats.slice(0).sort((a, b) => Math.random() - 0.5)
+     return {
+       categories: randomCats.slice(0, 2),
+       title: title
+     }
+   })
+   //   清空article
+   await Article.deleteMany({})
+   //   插入
+   await Article.insertMany(newsList)
+   res.send(newsList)
+   })
+   ```
+
+## ==【！！】==首页新闻资讯-数据接口
+
+1.  articlejs 模型里增添==虚拟字段==
+
+```
+// 虚拟字段newslist
+schema.virtual("newsList", {
+localField: "_id",
+foreignField: "categories",
+justOne: false,
+ref: "Article",
+});
+```
+
+2.  web/indexjs 中: 两次 polulate 关联
+    先从 top 分类-》关联到子分类-》子分类下的 newslist(用虚拟外键)获得 articlelist
+1.  不好：
+
+```
+    router.get('/news/list', async (req, res) => {
+    // const parent = await Category.findOne({
+    // name: '新闻分类'
+    // }).populate({
+    // path: 'children',
+    // populate: {
+    // path: 'newsList'
+    // }
+    // }).lean()
+    }
+```
+
+2.  更好：
+
+    1. mongo 聚合查询 aggregate，一次操作多次查询，具有管道（一次完成三个操作）
+       ```
+       const cats = await Category.aggregate([
+         <!--1.过滤 匹配 -->
+       { $match: { parent: parent._id } },
+         <!-- { 2. 相当于join 左关联接，起个名字 newslist-->
+           $lookup: {
+             from: 'articles',
+             localField: '_id',
+             foreignField: 'categories',
+             as: 'newsList'
+           }
+         },
+         {
+           <!-- 添加字段 -》3.  修改字段，只要5个-->
+           $addFields: {
+             newsList: { $slice: ['$newsList', 5] }
+       }
+       }
+       ])
+       ```
+    2. 增添：热门
+
+    ```
+        //   只要_id ，返回v._id
+    const subCats = cats.map(v => v._id)
+    cats.unshift({
+      name: '热门',
+      newsList: await Article.find().where({
+        categories: { $in: subCats }
+      }).populate('categories').limit(5).lean()
+    })
+
+
+    // 热门下的 article 要保存自己本来的 category
+    // 其他的还是自己的 category
+    // 三元运算符做判断
+    cats.map(cat => {
+    cat.newsList.map(news => {
+    news.categoryName = (cat.name === '热门')
+    ? news.categories[0].name : cat.name
+    return news
+    })
+    return cat
+    })
+    res.send(cats)
+
+    ```
+
+3.  web 安装引入 axios , 再 mainjs 里挂载
+
+```
+import axios from 'axios'
+Vue.prototype.$http = axios.create({
+  // baseURL: process.env.VUE_APP_API_URL || '/web/api'
+  baseURL: 'http://localhost:3000/web/api'
+})
+```
+
+4.  homevue 交互：
+1.  滑动时更新 tab 状态 -》》 slide-change 事件 ，realindex 属性
+    ` @slide-change="() => (active = $refs.list.$swiper.realIndex)"`
+1.  点击 tab-》绑定 slideto  
+    ` @click="$refs.list.$swiper.slideTo(i)"`
+1.  安装 dayjs 包解析事件戳
+
+```
+  filters: {
+  date(val) {
+    return dayjs(val).format("MM/DD");
+  },
+},
+```
+
+## 首页英雄列表-提取官网数据
+
+接口 heroes/init
+
+```
+  // 导入英雄数据
+  router.get("/heroes/init", async (req, res) => {
+    await Hero.deleteMany({});
+    // rawdata 是【{ category + heroslist}】
+    const rawData = [
+      {
+        name: "热门",
+        heroes: [
+          {
+            name: "后羿",
+            avatar:
+              "https://game.gtimg.cn/images/yxzj/img201606/heroimg/169/169.jpg",
+          },...{}
+    ];
+    for (let cat of rawData) {
+      if (cat.name === "热门") {
+        continue;
+      }
+      // 找到当前分类在数据库中对应的数据
+      const category = await Category.findOne({
+        name: cat.name,
+      });
+      cat.heroes = cat.heroes.map((hero) => {
+        <!-- 新字段categories -->
+        hero.categories = [category];
+        return hero;
+      });
+      // 录入英雄
+      await Hero.insertMany(cat.heroes);
+    }
+
+    res.send(await Hero.find());
+  });
+```
+
+## 首页英雄列表-界面展示
+
+1. 列表接口类似文章列表
+
+```
+// 英雄列表接口
+  // 类似文章接口
+  // 注意es
+  router.get("/heroes/list", async (req, res) => {
+    const parent = await Category.findOne({
+      name: "英雄",
+    });
+    const cats = await Category.aggregate([
+      { $match: { parent: parent._id } },
+      {
+        $lookup: {
+          from: "heroes",
+          localField: "_id",
+          foreignField: "categories",
+          // as -》 作为herolist
+          as: "heroList",
+        },
+      },
+    ]);
+    const subCats = cats.map((v) => v._id);
+    cats.unshift({
+      name: "热门",
+      heroList: await Hero.find()
+        .where({
+          categories: { $in: subCats },
+        })
+        .limit(10)
+        .lean(),
+    });
+
+    res.send(cats);
+  });
+```
+
+2. web 展示
+
+## 新闻详情页
+
+1. 新增路由 ` { path: "/articles/:id", name: "article", component: Article, props: true, },`
+   携带 id
+2. homevue routerlink 带 id 跳转路由
+
+```
+        <router-link
+          tag="div"
+          :to="`/articles/${news._id}`"
+          class="py-2 fs-lg d-flex"
+          v-for="(news, i) in category.newsList"
+          :key="i"
+        >
+```
+
+3. article.vue
+   v-if 防报错 没 model 就不要渲染，等 fetch 到了再渲染
+
+```
+ watch: {
+    //   监听id
+    id: 'fetch',
+    // id(){
+    //   this.fetch()
+    // }
+  },
+```
+
+4. 接口：
+
+```
+    // 文章详情
+    router.get("/articles/:id", async (req, res) => {
+      const data = await Article.findById(req.params.id).lean();
+      data.related = await Article.find()
+        .where({
+          categories: { $in: data.categories },
+        })
+        .limit(2);
+      res.send(data);
+    });
+```
+
+## 英雄详情页 hero.vue
+
+同样接受 id
+vue 页面不一样的地方：【 header 样式改变了(部分改变)】
+那么 herovue 不是 homevue 的 children
+router 中：
+` {path: '/heroes/:id', name: 'hero', component: Hero, props: true},`
+
+1. 重写 topbar，注意转义符
+
+```
+      <!-- 重写topbar 不用home的样式 -->
+    <div class="topbar bg-black py-2 px-3 d-flex ai-center text-white">
+      <img src="../assets/logo.png" height="30" />
+      <div class="px-2 flex-1">
+        <span class="text-white">王者荣耀</span>
+        <span class="ml-2">攻略站</span>
+      </div>
+      <!-- gt 是》 转义符，防止html标签报错 -->
+      <router-link to="/" tag="div">更多英雄 &gt;</router-link>
+    </div>
+```
+
+2. 获取数据 v-if 判断(同上)
+3. 写后台接口
+
+```
+// 英雄详情
+  router.get("/heroes/:id", async (req, res) => {
+    const data = await Hero.findById(req.params.id)
+      .populate("categories items1 items2 partners.hero")
+      .lean();
+    res.send(data);
+  });
+
+```
+
+4. 英雄 数据模型 加字段 banner(英雄背景图)
+5. herovue 写界面
+   v-if 保证存在再渲染
+   防止报错

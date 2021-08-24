@@ -14,6 +14,8 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 // 从routes/admin引入路由文件，是个函数，传入app参数执行
 // 这样在admin里面有一个app可以用
 require("./routes/admin")(app);
+// 引用web
+require("./routes/web")(app);
 
 // 引用数据库
 require("./plugins/db.js")(app);

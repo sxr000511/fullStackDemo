@@ -4,4 +4,7 @@ module.exports = (app) => {
     useNewUrlParser: true,
     // 还没用到app
   });
+
+  // 把文件引用进来全使用一遍
+  require("require-all")(__dirname + "/../models");
 };

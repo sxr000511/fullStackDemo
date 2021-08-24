@@ -34,5 +34,5 @@ const schema = new mongoose.Schema({
     },
   ],
 });
-
+// 确保集合名词 heroes（es）
 module.exports = mongoose.model("Hero", schema, "heroes");

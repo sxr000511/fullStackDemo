@@ -7,6 +7,7 @@ const schema = new mongoose.Schema(
     body: { type: String },
   },
   {
+    // 自动生成时间戳字段
     timestamps: true,
   }
 );

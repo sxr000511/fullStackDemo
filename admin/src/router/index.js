@@ -43,9 +43,9 @@ const router = new Router({
         { path: "/items/edit/:id", component: ItemEdit, props: true },
         { path: "/items/list", component: ItemList },
 
-        { path: "/heroes/create", component: HeroEdit },
-        { path: "/heroes/edit/:id", component: HeroEdit, props: true },
-        { path: "/heroes/list", component: HeroList },
+        { path: "/heros/create", component: HeroEdit },
+        { path: "/heros/edit/:id", component: HeroEdit, props: true },
+        { path: "/heros/list", component: HeroList },
 
         { path: "/articles/create", component: ArticleEdit },
         { path: "/articles/edit/:id", component: ArticleEdit, props: true },
