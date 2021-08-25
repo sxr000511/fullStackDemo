@@ -81,8 +81,20 @@ module.exports = (app) => {
   );
 
   const multer = require("multer");
+  // 阿里云
+  const MAO = require("multer-aliyun-oss");
 
-  const upload = multer({ dest: __dirname + "/../../uploads" });
+  const upload = multer({
+    storage: MAO({
+      config: {
+        region: "oss-cn-beijing",
+        accessKeyId: "LTAI5tQZEzeBZecC8imyTiQY",
+        accessKeySecret: "Rey07QkUFnKO0wpHvOcgdN61KxD7NT",
+        bucket: "node-vue-fullstack",
+      },
+    }),
+  });
+  // const upload = multer({ dest: __dirname + "/../../uploads" });
   // 中间件upload 允许接受字段名file得单个文件
 
   // app.post("/admin/api/upload", upload.single("file"), async (req, res) => {
@@ -99,7 +111,7 @@ module.exports = (app) => {
     upload.single("file"),
     async (req, res) => {
       const file = req.file;
-      file.url = `http://8.210.55.213/uploads/${file.filename}`;
+      // file.url = `http://8.210.55.213/uploads/${file.filename}`;
       res.send(file);
     }
   );
