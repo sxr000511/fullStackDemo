@@ -1442,3 +1442,45 @@ router 中：
 5. herovue 写界面
    v-if 保证存在再渲染
    防止报错
+
+## 发布部署：生产环境编译
+
+1. 域名问题 ： 源代码需要根据开发和编译替换 baseurl -》》 不含主机名的绝对地址
+   域名是什么接口就是什么
+   webpack 打包后有 process 变量，`process.env.VUE_APP_API_URL`是真正的接口地址，
+   ```
+   const http = axios.create({
+   baseURL: process.env.VUE_APP_API_URL || '/admin/api',
+   // baseURL: 'http://localhost:3000/admin/api'
+   })
+   ```
+2. `.env.development`
+   手动定义本地开发域名
+   ```
+   VUE_APP_API_URL = http://localhost:3000/admin/api
+   ```
+3. npm run build
+   在 server 里放置 dist -》 作为 admin
+   index 里静态文件托管【此处先托管到 3000 根下】
+
+```
+app.use("/", express.static(__dirname + "/admin"));
+```
+
+4. 至此通过 3000 可访问 admin
+
+5. 不安全：
+   1. 配置: outputdir -》 输出路径 ， publicpath ： 生产模式下加 admin，开发下不加
+
+```
+
+module.exports = {
+outputDir: \_\_dirname + '/../server/admin',
+publicPath: process.env.NODE_ENV === 'production'
+? '/admin/'
+: '/'
+}
+
+```
+
+    2. 至此 admin 托管到了 3000/admin

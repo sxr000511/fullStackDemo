@@ -10,6 +10,10 @@ app.set("secret", "12345667");
 
 // uploads下静态文件托管 ，通过/uploads可以访问
 app.use("/uploads", express.static(__dirname + "/uploads"));
+// admin 静态文件托管
+app.use("/admin", express.static(__dirname + "/admin"));
+// web托管到3000根
+app.use("/", express.static(__dirname + "/web"));
 
 // 从routes/admin引入路由文件，是个函数，传入app参数执行
 // 这样在admin里面有一个app可以用
