@@ -99,7 +99,7 @@ module.exports = (app) => {
     upload.single("file"),
     async (req, res) => {
       const file = req.file;
-      file.url = `http://localhost:3000/uploads/${file.filename}`;
+      file.url = `http://8.210.55.213/uploads/${file.filename}`;
       res.send(file);
     }
   );
