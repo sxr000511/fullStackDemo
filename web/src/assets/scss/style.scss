@@ -10,8 +10,10 @@ html {
 }
 body {
   margin: 0;
+  padding: 0;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.2em;
+  // 见官网
   background: #f1f1f1;
   -webkit-font-smoothing: antialiased;
 }
@@ -21,11 +23,13 @@ a {
 p {
   line-height: 1.5em;
 }
-
+// 颜色
 @each $colorKey, $color in $colors {
+  // .text-类
   .text-#{$colorKey} {
     color: $color;
   }
+  // .bg-类
   .bg-#{$colorKey} {
     background-color: $color;
   }
@@ -36,12 +40,15 @@ p {
     text-align: $var !important;
   }
 }
-
+// 字体
+// map的@each语法，keyvalue 键值对
 @each $sizeKey, $size in $font-sizes {
   .fs-#{$sizeKey} {
     font-size: $size * $base-font-size;
   }
 }
+
+// 普通css定义
 // text overflow
 .text-ellipsis {
   display: inline-block;
@@ -57,7 +64,9 @@ p {
 .h-100 {
   height: 100%;
 }
-// flex
+// ////////////////////////
+// flex布局
+// display-flex
 .d-flex {
   display: flex;
 }
@@ -67,13 +76,13 @@ p {
 .flex-wrap {
   flex-wrap: wrap;
 }
-
+// .jc-center  /.jc-around etc
 @each $key, $value in $flex-jc {
   .jc-#{$key} {
     justify-content: $value;
   }
 }
-
+// .ai-center .ai-items
 @each $key, $value in $flex-ai {
   .ai-#{$key} {
     align-items: $value;
@@ -86,7 +95,9 @@ p {
   flex-grow: 1;
 }
 
-// m-0, mx-0
+// //////////////////////////////////
+// 边距 m：margin
+// m-0, mx-0 左右  my上下
 @each $typeKey, $type in $spacing-types {
   // .m-1
   @each $sizeKey, $size in $spacing-sizes {
@@ -96,6 +107,7 @@ p {
   }
   // .mx-1 , .my-1
   @each $sizeKey, $size in $spacing-sizes {
+    // 插值语句   #{$var}
     .#{$typeKey}x-#{$sizeKey} {
       #{$type}-left: $size * $spacing-base-size;
       #{$type}-right: $size * $spacing-base-size;
@@ -143,6 +155,7 @@ p {
 // nav
 .nav {
   display: flex;
+
   .nav-item {
     border-bottom: 3px solid transparent;
     padding-bottom: 0.2rem;
@@ -166,14 +179,71 @@ p {
   background: url(../images/index.png) no-repeat 0 0;
   background-size: 28.8462rem;
   display: inline-block;
-  &.sprite-news {
+
+  &.sprite-blz {
     width: 1.7692rem;
     height: 1.5385rem;
     background-position: 63.546% 15.517%;
+  }
+  &.sprite-gsz {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 90.483% 15.614%;
+  }
+  &.sprite-zbsc {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 36.746% 0.924%;
+  }
+  &.sprite-tyf {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 10.408% 15.517%;
+  }
+  &.sprite-xrzq {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 89.733% 1.266%;
+  }
+  &.sprite-rycc {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 36.467% 15.287%;
+  }
+  &.sprite-wzyd {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 63.3% 0.927%;
+  }
+  &.sprite-gzh {
+    width: 1.7692rem;
+    height: 1.5385rem;
+    background-position: 36.746% 0.924%;
   }
   &.sprite-arrow {
     width: 0.7692rem;
     height: 0.7692rem;
     background-position: 38.577% 52.076%;
+  }
+}
+
+.icon {
+  background: url(../images/index.png) no-repeat 0 0;
+  background-size: 28.8462rem;
+  display: inline-block;
+  &.icon-etc {
+    width: 1.3846rem;
+    height: 0.2308rem;
+    background-position: 47.619% 56.305%;
+  }
+  &.icon-news {
+    width: 1rem;
+    height: 1rem;
+    background-position: 0.138% 50.452%;
+  }
+  &.icon-hero {
+    width: 0.9231rem;
+    height: 1rem;
+    background-position: 46.768% 60.452%;
   }
 }

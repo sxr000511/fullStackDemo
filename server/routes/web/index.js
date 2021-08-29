@@ -10,6 +10,8 @@ module.exports = (app) => {
   //   const Article = mongoose.model("Article");
   //   const Hero = mongoose.model("Hero");
 
+  // ////////////////////////////////////////////////////
+  // 数据初始化
   // 导入新闻数据
   router.get("/news/init", async (req, res) => {
     // 每次调用init接口都会清空article 插入随机的数据
@@ -59,62 +61,6 @@ module.exports = (app) => {
     //   插入
     await Article.insertMany(newsList);
     res.send(newsList);
-  });
-
-  // 新闻列表接口
-  router.get("/news/list", async (req, res) => {
-    // const parent = await Category.findOne({
-    //   name: '新闻分类'
-    // }).populate({
-    //   path: 'children',
-    //   populate: {
-    //     path: 'newsList'
-    //   }
-    // }).lean()
-    const parent = await Category.findOne({
-      name: "新闻分类",
-    });
-    const cats = await Category.aggregate([
-      { $match: { parent: parent._id } },
-      {
-        $lookup: {
-          from: "articles",
-          localField: "_id",
-          foreignField: "categories",
-          as: "newsList",
-        },
-      },
-      {
-        $addFields: {
-          newsList: { $slice: ["$newsList", 5] },
-        },
-      },
-    ]);
-    //   只要_id ，返回v._id
-    const subCats = cats.map((v) => v._id);
-    cats.unshift({
-      name: "热门",
-      newsList: await Article.find()
-        .where({
-          categories: { $in: subCats },
-        })
-        .populate("categories")
-        .limit(5)
-        .lean(),
-    });
-
-    //   热门下的article要保存自己本来的category
-    // 其他的还是自己的category
-    // 三元运算符做判断
-    cats.map((cat) => {
-      cat.newsList.map((news) => {
-        news.categoryName =
-          cat.name === "热门" ? news.categories[0].name : cat.name;
-        return news;
-      });
-      return cat;
-    });
-    res.send(cats);
   });
 
   // 导入英雄数据
@@ -690,6 +636,64 @@ module.exports = (app) => {
     }
 
     res.send(await Hero.find());
+  });
+
+  // ///////////////////////////////////////////////////
+  //  数据接口
+  // 新闻列表接口
+  router.get("/news/list", async (req, res) => {
+    // const parent = await Category.findOne({
+    //   name: '新闻分类'
+    // }).populate({
+    //   path: 'children',
+    //   populate: {
+    //     path: 'newsList'
+    //   }
+    // }).lean()
+    const parent = await Category.findOne({
+      name: "新闻分类",
+    });
+    const cats = await Category.aggregate([
+      { $match: { parent: parent._id } },
+      {
+        $lookup: {
+          from: "articles",
+          localField: "_id",
+          foreignField: "categories",
+          as: "newsList",
+        },
+      },
+      {
+        $addFields: {
+          newsList: { $slice: ["$newsList", 5] },
+        },
+      },
+    ]);
+    //   只要_id ，返回v._id
+    const subCats = cats.map((v) => v._id);
+    cats.unshift({
+      name: "热门",
+      newsList: await Article.find()
+        .where({
+          categories: { $in: subCats },
+        })
+        .populate("categories")
+        .limit(5)
+        .lean(),
+    });
+
+    //   热门下的article要保存自己本来的category
+    // 其他的还是自己的category
+    // 三元运算符做判断
+    cats.map((cat) => {
+      cat.newsList.map((news) => {
+        news.categoryName =
+          cat.name === "热门" ? news.categories[0].name : cat.name;
+        return news;
+      });
+      return cat;
+    });
+    res.send(cats);
   });
 
   // 英雄列表接口

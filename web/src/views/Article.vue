@@ -1,76 +1,50 @@
-
 <template>
-  <div class="page-article" v-if="model">
-    <div class="d-flex py-3 px-2 border-bottom">
-      <!-- 应该是back icon -->
-      <div class="iconfont icon-category text-blue"></div>
-      <strong class="flex-1 text-blue pl-2">{{ model.title }}</strong>
-      <div class="text-grey fs-xs">2019-06-19</div>
+  <div class="article" v-if="article">
+    <div class="d-flex ai-center py-3 px-1">
+      <a href="/"></a>
+      <strong class="flex-1 ml-2">{{ article.title }}</strong>
     </div>
-    <div v-html="model.body" class="px-3 body fs-lg"></div>
-    <div class="px-3 border-top py-3">
-      <div class="d-flex ai-center">
-        <i class="iconfont icon-menu1"></i>
-        <strong class="text-blue fs-lg ml-1">相关资讯</strong>
-      </div>
-      <div class="pt-2">
-        <router-link
-          class="py-1"
-          tag="div"
-          :to="`/articles/${item._id}`"
-          v-for="item in model.related"
-          :key="item._id"
-          >{{ item.title }}</router-link
-        >
-      </div>
-    </div>
+    <div v-html="article.body" class="content w-100 px-3 py-2"></div>
   </div>
 </template>
 
 <script>
 export default {
   props: {
-    //   接收参数
-    id: { required: true },
+    id: { type: String, requried: true },
   },
   data() {
     return {
-      model: null,
+      article: null,
     };
   },
-  watch: {
-    //   监听id
-    id: "fetch",
-    // id(){
-    //   this.fetch()
-    // }
-  },
   methods: {
-    async fetch() {
-      const res = await this.$http.get(`articles/${this.id}`);
-      this.model = res.data;
+    async initArticle() {
+      const res = await this.$http.get(`/articles/${this.id}`);
+      this.article = res.data;
     },
   },
   created() {
-    this.fetch();
+    this.initArticle();
   },
 };
 </script>
 
 <style lang="scss">
-.page-article {
-  .icon-Back {
-    font-size: 1.6923rem;
+.article a {
+  background: url(https://game.gtimg.cn/images/yxzj/m/m201606/cp/backBg.png)
+    no-repeat center;
+  background-size: 8px 14px;
+  width: 8px;
+  height: 14px;
+}
+
+.content {
+  p {
+    font-size: 1.2rem;
   }
-  .body {
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-    iframe {
-      width: 100%;
-      height: auto;
-    }
+  img {
+    width: 100%;
   }
 }
 </style>

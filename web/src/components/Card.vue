@@ -1,17 +1,13 @@
 <template>
-<!--  card组件构成了卡片布局最上面的header -->
-  <div class="card bg-white p-3 mt-3">
-    <div
-      class="card-header d-flex ai-center"
-      :class="{ 'border-bottom': !plain, 'pb-3': !plain }"
-    >
-      <i class="iconfont" :class="`icon-${icon}`"></i>
-      <div class="fs-xl flex-1 px-2">
-        <strong>{{ title }}</strong>
-      </div>
-      <i class="iconfont icon-menu" v-if="!plain"></i>
+  <div class="card mt-3 p-3 bg-white">
+    <!-- head -->
+    <div class="card-header d-flex ai-center pb-3 pt-2">
+      <i class="icon" :class="`icon-${icon}`"></i>
+      <div class="fs-xxl flex-1 px-2">{{ title }}</div>
+      <i class="icon icon-etc"></i>
     </div>
-    <div class="card-body pt-3">
+    <!-- body -->
+    <div class="card-body pt-2">
       <slot></slot>
     </div>
   </div>
@@ -20,16 +16,21 @@
 <script>
 export default {
   props: {
-    title: { type: String, required: true },
-    icon: { type: String, required: true },
-    plain: { type: Boolean },
+    title: {
+      type: String,
+      required: true,
+    },
+    icon: {
+      type: String,
+      required: true,
+    },
   },
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" >
 @import "../assets/scss/_variables.scss";
-.card {
+.card-header {
   border-bottom: 1px solid $border-color;
 }
 </style>

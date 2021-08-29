@@ -1,4 +1,5 @@
 // colors
+// Map
 $colors: (
   "primary": #db9e3f,
   "info": #4b67af,
@@ -16,6 +17,7 @@ $colors: (
   "dark": #222,
   "black": #000,
 );
+// map语法 map-get获得value
 $border-color: map-get($colors, "light-1");
 // font size
 $base-font-size: 1rem;
@@ -45,6 +47,8 @@ $flex-ai: (
   center: center,
   stretch: stretch,
 );
+
+// //////////////////////////////////////////////////
 // spacing
 // 0-5: 0
 // .mt-1  => margin top  .pb-2

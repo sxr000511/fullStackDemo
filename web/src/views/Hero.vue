@@ -17,9 +17,11 @@
       <div class="info text-white p-3 h-100 d-flex flex-column jc-end">
         <div class="fs-sm">{{ model.title }}</div>
         <h2 class="my-2">{{ model.name }}</h2>
+        <!-- 样式：/连接两组汉字 -->
         <div class="fs-sm">
           {{ model.categories.map((v) => v.name).join("/") }}
         </div>
+        <!-- 难度小图标组 -->
         <div class="d-flex jc-between pt-2">
           <div class="scores d-flex ai-center" v-if="model.scores">
             <span>难度</span>
@@ -38,6 +40,8 @@
       </div>
     </div>
     <!-- end of top -->
+
+    <!-- 下部分展示： tab+swiper -->
     <div>
       <div class="bg-white px-3">
         <div class="nav d-flex jc-around pt-3 pb-2 border-bottom">
@@ -49,7 +53,10 @@
           </div>
         </div>
       </div>
+
+      <!-- swiper两扇 -->
       <swiper>
+        <!-- 英雄初时 -->
         <swiper-slide>
           <div>
             <div class="p-3 bg-white border-bottom">
@@ -63,7 +70,7 @@
                   英雄介绍视频
                 </router-link>
               </div>
-
+              <!-- 英雄技能 -->
               <!-- skills -->
               <div class="skills bg-white mt-4">
                 <div class="d-flex jc-around">
@@ -90,8 +97,9 @@
                 </div>
               </div>
             </div>
-
+            <!-- 卡片复用，这里用最简单的就行 -->
             <m-card plain icon="menu1" title="出装推荐" class="hero-items">
+              <!--  -->
               <div class="fs-xl">顺风出装</div>
               <div class="d-flex jc-around text-center mt-3">
                 <div v-for="item in model.items1" :key="item.name">
@@ -100,6 +108,7 @@
                 </div>
               </div>
               <div class="border-bottom mt-3"></div>
+              <!--  -->
               <div class="fs-xl mt-3">逆风出装</div>
               <div class="d-flex jc-around text-center mt-3">
                 <div v-for="item in model.items2" :key="item.name">
@@ -107,6 +116,8 @@
                   <div class="fs-xs">{{ item.name }}</div>
                 </div>
               </div>
+
+              <!--  -->
             </m-card>
             <m-card plain icon="menu1" title="使用技巧">
               <p class="m-0">{{ model.usageTips }}</p>
@@ -133,6 +144,8 @@
             </m-card>
           </div>
         </swiper-slide>
+
+        <!-- 进阶攻略 -->
         <swiper-slide></swiper-slide>
       </swiper>
     </div>

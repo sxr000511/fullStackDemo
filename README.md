@@ -1484,3 +1484,6 @@ publicPath: process.env.NODE_ENV === 'production'
 ```
 
     2. 至此 admin 托管到了 3000/admin
+
+6. 阿里云 -》 文件存到公共地址，本地和服务器都可以用
+   multeraliyun npm 包

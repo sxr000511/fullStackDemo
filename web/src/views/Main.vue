@@ -1,28 +1,36 @@
 <template>
   <div>
-    <!-- topbar模块 -->
-    <!-- px -> 左右padding py-》上下padding -->
-    <div class="topbar bg-black py-2 px-3 d-flex ai-center">
-      <img src="../assets/logo.png" height="30" alt="" />
-      <!-- flex-1 : flexgrow 1 自己增大 占据剩余所有空间 -->
-      <div class="px-2 flex-1">
-        <div class="text-white">王者荣耀</div>
-        <div class="text-grey-1 fs-xxs">团队成就更多</div>
+    <div
+      class="topbar w-100 bg-black pt-2 pb-1 px-3 text-white d-flex ai-center"
+    >
+      <img src="../assets/logo.png" alt="" height="30" />
+      <!-- 一个div包裹text -->
+      <div class="ml-2 flex-grow-1">
+        <div>王者荣耀</div>
+        <div class="text-grey fs-xs">团队成就更多</div>
       </div>
-      <button type="button" class="btn bg-primary">立即下载</button>
+      <div class="btn bg-primary text-black">立即下载</div>
     </div>
-    <!-- nav模块 -->
-    <div class="bg-primary pt-3 pb-2">
-      <!-- justifycontent ->spacearound -->
-      <div class="nav nav-inverse pb-1 jc-around">
+
+    <div class="bg-primary pt-3 pb-2 d-flex jc-around text-white">
+      <div class="nav nav-inverse">
         <div class="nav-item active">
-          <router-link class="nav-link" tag="div" to="/">首页</router-link>
+          <router-link class="nav-link" to="/" tag="div">首页</router-link>
         </div>
+      </div>
+      <div class="nav nav-inverse">
         <div class="nav-item">
-          <router-link class="nav-link" tag="div" to="/">攻略中心</router-link>
+          <router-link class="nav-link" to="/" tag="div">攻略中心</router-link>
         </div>
+      </div>
+      <div class="nav nav-inverse">
         <div class="nav-item">
-          <router-link class="nav-link" tag="div" to="/">赛事中心</router-link>
+          <router-link class="nav-link" to="/" tag="div">赛事中心</router-link>
+        </div>
+      </div>
+      <div class="nav nav-inverse">
+        <div class="nav-item">
+          <router-link class="nav-link" to="/" tag="div">IP新游</router-link>
         </div>
       </div>
     </div>

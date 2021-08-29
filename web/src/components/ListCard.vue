@@ -1,34 +1,31 @@
 <template>
-  <!-- listcard由card而来 -->
   <m-card :icon="icon" :title="title">
-    <div class="nav jc-between">
-      <!-- v-for循环tab，显示传入的categories -->
-      <!-- 点击-》滚动-》滚动高亮 -->
-      <div
-        class="nav-item"
-        :class="{ active: active === i }"
-        v-for="(category, i) in categories"
-        :key="i"
-        @click="$refs.list.$swiper.slideTo(i)"
-      >
-        <div class="nav-link">{{ category.name }}</div>
+    <div class="card-body">
+      <div class="nav jc-between">
+        <div
+          class="nav-item"
+          :class="{ active: active === index }"
+          v-for="(item, index) in categories"
+          :key="index"
+          @click="$refs.list.$swiper.slideTo(index)"
+        >
+          <div class="nav-link">{{ item.name }}</div>
+        </div>
       </div>
-    </div>
-    <!-- 文字slide -->
-    <div class="pt-3">
-      <swiper
-        ref="list"
-        :options="{ autoHeight: true }"
-        @slide-change="() => (active = $refs.list.$swiper.realIndex)"
-      >
-        <swiper-slide v-for="(category, i) in categories" :key="i">
-          <!-- 插槽 -->
-          <!-- 作用域插槽 -->
-          <!-- 绑定category(传入的单个元素) 给slot ，外部父组件用# 可以获得category -->
-          <slot name="items" :category="category"></slot>
-          <!--  -->
-        </swiper-slide>
-      </swiper>
+
+      <!-- 重点：怎么展示数据？ item传出去，外面接收到item找到对应的data通过slot传回来 -->
+      <div class="mt-2">
+        <swiper
+          ref="list"
+          @slide-change="() => (active = $refs.list.$swiper.realIndex)"
+          :options="{ autoHeight: true }"
+        >
+          <swiper-slide v-for="(item, index) in categories" :key="index">
+            <!-- category 给外面， item是内部v-for -->
+            <slot name="item" :category="item"></slot>
+          </swiper-slide>
+        </swiper>
+      </div>
     </div>
   </m-card>
 </template>
@@ -43,7 +40,6 @@ export default {
   },
   data() {
     return {
-      // 默认0高亮
       active: 0,
     };
   },

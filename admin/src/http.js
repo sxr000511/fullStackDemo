@@ -1,4 +1,5 @@
-// axios数据请求接口请求
+//http：创建的axios实例，
+// 发送 axios数据请求接口请求
 
 import Vue from "vue";
 import axios from "axios";
@@ -9,6 +10,8 @@ import router from "./router";
 //   baseURL: "http://localhost:3000/admin/api",
 // });
 
+// 设置axios实例的baseurl
+// 是动态url
 const http = axios.create({
   baseURL: process.env.VUE_APP_API_URL || "/admin/api",
   // baseURL: 'http://localhost:3000/admin/api'
@@ -38,6 +41,7 @@ http.interceptors.response.use(
   },
   (err) => {
     if (err.response.data.message) {
+      // 弹出错误-》elementui
       Vue.prototype.$message({
         type: "error",
         message: err.response.data.message,
